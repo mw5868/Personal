@@ -1,4 +1,5 @@
 # Testing the BATMAN exoplanet code
+# Example code taken from BATMAN tutoral.
 import batman
 import numpy as np
 import matplotlib.pyplot as plt
