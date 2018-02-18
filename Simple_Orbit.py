@@ -1,4 +1,4 @@
-from orbital import KeplerianElements, earth, Maneuver
+from orbital import KeplerianElements, earth, Maneuver, plot
 from scipy.constants import kilo
 import matplotlib.pyplot as plt
 
