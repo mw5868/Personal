@@ -11,3 +11,6 @@ plt.xlabel("RA")
 plt.ylabel("DEC")
 plt.title("Exoplanet Archive API Demo")
 plt.show()
+
+t_trans = t[t["pl_discmethod"]=="Transit"] # Creates a new table of only planets discovered by Transit.
+
