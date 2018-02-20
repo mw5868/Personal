@@ -5,15 +5,16 @@ Created on Sat Feb 17 17:54:38 2018
 @author: mwood
 """
 
-from orbital import earth, KeplerianElements,Maneuver, plot, plot3d
-from numpy import radians
-from scipy.constants import kilo, minute
+from astropy.table import Table
+import matplotlib.pyplot as plt
 
-from orbital import earth_sidereal_day
+url = "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets"
 
-orbit = KeplerianElements.with_period(88.47*minute,body=earth,i=radians(32.5),ref_epoch="J1962")
-#plot(orbit,title="orbit")
+t = Table.read(url,format="csv")
 
-plot3d(orbit, title="First Orbit of Friendship-7",animate=True)
+t_trans = t[["pl_discmethod"]=="Transit"]
 
+fig, axes = plt.subplots(1,1,figsize=(8,10),subplot_kw={"projection":"aitoff"})
 
+axes.set_title("Transit")
+plt.scatter(t_trans["ra"],t_trans["dec"],color="red")
