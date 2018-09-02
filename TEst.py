@@ -1,69 +1,36 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Feb 17 17:54:38 2018
-
-@author: mwood
-"""
-import numpy as np
-import scipy.signal
+from astropy.table import Table, Column
 import matplotlib.pyplot as plt
+#url = "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets&select=pl_hostname,ra,dec&order=dec&format=csv"
+url = "https://exoplanetarchive.ipac.caltech.edu/cgi-bin/nstedAPI/nph-nstedAPI?table=exoplanets"
+# This API returns Hostname, RA and Dec
 
-# Configure the plotting aesthetics (boring)
+t = Table.read(url, format="csv")
 
-from matplotlib import rcParams
-rcParams["figure.figsize"] = (14, 5)
-rcParams["font.size"] = 20
+t_b = t[t["pl_letter"] == "b"]
+t_c = t[t["pl_letter"] == "c"]
+t_d = t[t["pl_letter"] == "d"]
+t_e = t[t["pl_letter"] == "e"]
+t_f = t[t["pl_letter"] == "f"]
+t_g = t[t["pl_letter"] == "g"]
+t_h = t[t["pl_letter"] == "h"]
+t_i = t[t["pl_letter"] == "i"]
 
-url = "https://archive.stsci.edu/missions/kepler/target_pixel_files/0119/011904151/kplr011904151-2010009091648_lpd-targ.fits.gz"
-url2 = "https://archive.stsci.edu/missions/kepler/target_pixel_files/0019/001995038/kplr001995038-2009131105131_lpd-targ.fits.gz"
+fig = plt.figure()
+ax = fig.add_subplot(1,1,1,aspect="equal")
+ax.scatter(t_b["ra"],t_b["dec"],color="Black",label = "2 Planets")
+ax.scatter(t_c["ra"],t_c["dec"],color="red", label = "3 Planets")
+ax.scatter(t_d["ra"],t_d["dec"],color="blue", label = "4 Planets")
+ax.scatter(t_e["ra"],t_e["dec"],color="green", label = "5 Planets")
+ax.scatter(t_f["ra"],t_f["dec"],color="yellow", label = "6 Planets")
+ax.scatter(t_g["ra"],t_g["dec"],color="purple", label = "7 Planets")
+ax.scatter(t_h["ra"],t_h["dec"],color="orange", label = "8 Planets")
+ax.scatter(t_i["ra"],t_i["dec"],color="cyan", label = "9 Planets")
 
-# Read in Kepler data for star number 011904151
-import astropy.io.fits
-data = astropy.io.fits.open(url2)[1].data
-time = data["TIME"][data['QUALITY'] == 0]
-images = data["FLUX"][data['QUALITY'] == 0]
-
-time[0:5]  # The units are in days
-
-images[0:5]  # The images give us photons per pixel per second
-
-# Let's plot the image at the first timestamp
-plt.imshow(images[0], cmap='gray', interpolation='nearest');
-
-# Let's create a lightcurve by summing the flux in all the time cadences
-lightcurve = np.sum(images, axis=(1, 2))
-
-plt.plot(time, lightcurve, '.')
-plt.ylabel("Brightness")
-plt.xlabel("Time");
-
-trend = scipy.signal.savgol_filter(lightcurve, 101, polyorder=3) 
-percent_change = 100 * ((lightcurve / trend) - 1)
-
-plt.plot(time, percent_change, '.')
-plt.ylabel("Brightness change (%)")
-plt.xlabel("Time");
-
-# We will use the Lomb-Scargle Periodogram.
-# For background, see Jake VanderPlas' blog at https://jakevdp.github.io/blog/2015/06/13/lomb-scargle-in-python/
-from astropy.stats import LombScargle
-frequency, power = LombScargle(time, percent_change, nterms=2).autopower(minimum_frequency=1/1.5, maximum_frequency=1/0.6, samples_per_peak=10)
-period = 1 / frequency[np.argmax(power)]
-
-plt.plot(1 / frequency, power)
-plt.xlabel("Period (days)")
-plt.ylabel("Power");
-
-n_plots = 10
-plt.figure(figsize=(10, 30))
-for i in range(n_plots):
-    mask = (time >= time[0] + i*period) & (time < time[0] + (i+1)*period)
-    plt.subplot(n_plots, 1, i+1)
-    plt.scatter(time[mask], percent_change[mask], c='C{}'.format(i))
-
-plt.figure(figsize=(10, 5))
-for i in range(n_plots):
-    mask = (time >= time[0] + i*period) & (time < time[0] + (i+1)*period)
-    plt.scatter(time[mask] - time[0] - i*period, percent_change[mask])
-
-
+ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+ax.set_xlim(360,0)
+ax.set_ylim(-90,90)
+ax.set_ylabel("DEC")
+ax.set_xlabel("RA")
+ax.set_title("Positions of Explanets by number of planets in system")
+plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+plt.show()
